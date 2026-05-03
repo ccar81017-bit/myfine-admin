@@ -3,226 +3,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MyFine Premium Panel</title>
+    <title>MyFine Premium</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --bg-color: #0f121a;
-            --card-bg: rgba(23, 28, 41, 0.8);
-            --accent-blue: #0088cc;
-            --accent-purple: #6a5acd;
-            --text-main: #ffffff;
-            --text-dim: #94a3b8;
-            --danger: #ff4d4d;
-            --warning: #ffb84d;
-            --success: #2ecc71;
+            --bg: #0b0e14;
+            --card: #171c26;
+            --accent: #3794ff;
+            --danger: #eb4d4b;
+            --warn: #f0932b;
+            --success: #6ab04c;
+            --text: #ffffff;
         }
 
         body {
-            background-color: var(--bg-color);
-            background-image: radial-gradient(circle at top right, #1a1f35, #0f121a);
-            color: var(--text-main);
-            font-family: 'Inter', -apple-system, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
             margin: 0;
             padding: 16px;
-            overflow-x: hidden;
-        }
-
-        .header {
-            text-align: center;
-            padding: 20px 0;
-            animation: fadeInDown 0.8s ease;
-        }
-
-        .header h1 {
-            font-size: 26px;
-            background: linear-gradient(90deg, #fff, var(--accent-blue));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin: 0;
-        }
-
-        /* Список админов с эффектом стекла */
-        .admin-section {
             display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
+            flex-direction: column;
+            gap: 16px;
         }
 
-        .admin-chip {
-            background: var(--card-bg);
-            border: 1px solid rgba(255,255,255,0.1);
-            padding: 8px 15px;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            white-space: nowrap;
-            font-size: 13px;
-            backdrop-filter: blur(10px);
-        }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            margin-right: 8px;
-        }
-        .dot-on { background: var(--success); box-shadow: 0 0 10px var(--success); }
-        .dot-off { background: #555; }
-
-        /* Карточки управления */
-        .card {
-            background: var(--card-bg);
-            border-radius: 20px;
+        .section {
+            background: var(--card);
+            border-radius: 18px;
             padding: 20px;
-            margin-bottom: 16px;
-            border: 1px solid rgba(255,255,255,0.05);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            transition: transform 0.2s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
 
-        h3 {
-            font-size: 14px;
-            color: var(--text-dim);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin: 0 0 15px 0;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        h2 { font-size: 14px; color: #828a99; text-transform: uppercase; margin: 0 0 15px 0; letter-spacing: 0.5px; }
 
-        .input-group { margin-bottom: 15px; }
-
+        .input-group { margin-bottom: 12px; }
+        
         input {
             width: 100%;
-            background: rgba(0,0,0,0.2);
-            border: 1px solid #30363d;
-            border-radius: 12px;
             padding: 14px;
+            background: #0d1117;
+            border: 1px solid #2d343e;
+            border-radius: 12px;
             color: white;
-            font-size: 15px;
+            font-size: 16px;
             box-sizing: border-box;
-            transition: 0.3s;
+            outline: none;
+            transition: 0.2s;
         }
 
-        input:focus { border-color: var(--accent-blue); outline: none; background: rgba(0,0,0,0.4); }
+        input:focus { border-color: var(--accent); }
 
-        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-
-        button {
+        .btn {
+            width: 100%;
+            padding: 14px;
             border: none;
             border-radius: 12px;
-            padding: 14px;
+            font-size: 15px;
             font-weight: 600;
-            font-size: 14px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            transition: 0.3s;
-            color: white;
+            transition: 0.2s;
+            margin-top: 8px;
         }
 
-        .btn-primary { background: linear-gradient(135deg, var(--accent-blue), #0055ff); }
-        .btn-warning { background: linear-gradient(135deg, var(--warning), #e67e22); color: #000; }
-        .btn-success { background: linear-gradient(135deg, var(--success), #27ae60); width: 100%; }
+        .btn:active { transform: scale(0.97); }
 
-        button:active { transform: scale(0.95); opacity: 0.9; }
+        .btn-warn { background: var(--warn); color: white; }
+        .btn-mute { background: var(--accent); color: white; }
+        .btn-bc { background: var(--success); color: white; }
 
-        @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .admin-badge {
+            background: #232a35;
+            padding: 6px 12px;
+            border-radius: 50px;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin: 4px;
         }
 
-        /* Кастомный скроллбар */
-        ::-webkit-scrollbar { height: 4px; }
-        ::-webkit-scrollbar-thumb { background: var(--accent-blue); border-radius: 10px; }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .online { background: var(--success); box-shadow: 0 0 8px var(--success); }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>MyFine ✨ Edition</h1>
+    <div class="section">
+        <h2>Администрация в сети</h2>
+        <div id="admin_list" style="display: flex; flex-wrap: wrap;"></div>
     </div>
 
-    <div class="admin-section" id="admin_list">
-        </div>
-
-    <div class="card">
-        <h3><i class="fas fa-shield-halved"></i> Контроль игроков</h3>
+    <div class="section">
+        <h2>Модерация игрока</h2>
         <div class="input-group">
-            <input type="text" id="target_user" placeholder="Никнейм или Telegram ID">
+            <input type="text" id="target" placeholder="Никнейм (без @) или ID">
         </div>
-        <div class="btn-grid">
-            <button class="btn-warning" onclick="sendAction('warn')">
-                <i class="fas fa-triangle-exclamation"></i> ВАРН
+        <button class="btn btn-warn" onclick="send('warn')">
+            <i class="fas fa-exclamation-triangle"></i> Выдать Варн
+        </button>
+        <div style="margin-top: 15px;">
+            <input type="number" id="time" placeholder="Минуты мута">
+            <button class="btn btn-mute" onclick="send('mute')">
+                <i class="fas fa-comment-slash"></i> Отправить в мут
             </button>
-            <button class="btn-primary" onclick="showMuteField()">
-                <i class="fas fa-comment-slash"></i> МУТ
-            </button>
-        </div>
-        <div id="mute_controls" style="display:none; margin-top:15px;">
-            <input type="number" id="mute_time" placeholder="Минуты">
-            <button class="btn-primary" style="margin-top:10px; width:100%" onclick="sendAction('mute')">ПОДТВЕРДИТЬ МУТ</button>
         </div>
     </div>
 
-    <div class="card">
-        <h3><i class="fas fa-paper-plane"></i> Глобальная рассылка</h3>
-        <div class="input-group">
-            <input type="text" id="bc_msg" placeholder="Текст вашего сообщения...">
-        </div>
-        <button class="btn-success" onclick="sendAction('broadcast')">
-            <i class="fas fa-broadcast-tower"></i> ОТПРАВИТЬ ВСЕМ
+    <div class="section">
+        <h2>Рассылка в группу</h2>
+        <input type="text" id="bc_msg" placeholder="Текст объявления...">
+        <button class="btn btn-bc" onclick="send('broadcast')">
+            <i class="fas fa-paper-plane"></i> Разослать
         </button>
     </div>
 
     <script>
         let tg = window.Telegram.WebApp;
+        tg.ready();
         tg.expand();
-        tg.MainButton.setParams({ text: "ЗАКРЫТЬ ПАНЕЛЬ", color: "#2c3e50" });
-        tg.MainButton.show();
-        tg.MainButton.onClick(() => tg.close());
+        tg.enableClosingConfirmation();
 
-        // Получение админов из URL
         window.onload = function() {
             const params = new URLSearchParams(window.location.search);
             const data = params.get('admins');
             if(data) {
                 const admins = JSON.parse(decodeURIComponent(data));
-                const container = document.getElementById('admin_list');
-                container.innerHTML = admins.map(a => `
-                    <div class="admin-chip">
-                        <span class="status-dot ${a.online ? 'dot-on' : 'dot-off'}"></span>
-                        ${a.login}
+                document.getElementById('admin_list').innerHTML = admins.map(a => `
+                    <div class="admin-badge">
+                        <div class="status-dot ${a.online?'online':''}"></div> ${a.login}
                     </div>
                 `).join('');
             }
         };
 
-        function showMuteField() {
-            document.getElementById('mute_controls').style.display = 'block';
-        }
-
-        function sendAction(type) {
-            let res = { action: type };
-            if(type === 'warn') res.user = document.getElementById('target_user').value;
-            if(type === 'mute') {
-                res.user = document.getElementById('target_user').value;
-                res.time = document.getElementById('mute_time').value;
+        function send(action) {
+            let res = { action: action };
+            if(action !== 'broadcast') {
+                res.user = document.getElementById('target').value.trim();
+                if(!res.user) return tg.showAlert("Укажите ник игрока!");
             }
-            if(type === 'broadcast') res.text = document.getElementById('bc_msg').value;
+            if(action === 'mute') res.time = document.getElementById('time').value || 10;
+            if(action === 'broadcast') res.text = document.getElementById('bc_msg').value;
 
-            if(!res.user && type !== 'broadcast') {
-                tg.HapticFeedback.notificationOccurred('error');
-                return alert("Укажите цель!");
-            }
-            
             tg.HapticFeedback.impactOccurred('medium');
             tg.sendData(JSON.stringify(res));
             tg.close();
