@@ -14,7 +14,6 @@
             --text: var(--tg-theme-text-color, #222);
             --hint: var(--tg-theme-hint-color, #999);
             --error: #e74c3c;
-            --success: #2ecc71;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -154,52 +153,49 @@
         }
 
         hr { border: 0; border-top: 1px solid rgba(0,0,0,0.05); margin: 20px 0; }
-
         .hidden { display: none; }
-
-        /* Специальный стиль для кастомной кнопки */
         .btn-orange { background: #f39c12 !important; }
     </style>
 </head>
 <body>
 
     <div id="login-screen" class="card">
-        <h2>MyFine ✨</h2>
+        <h2>Вход в MyFine ✨</h2>
         <div id="login-error" class="error-msg">Неверный логин или пароль</div>
         
         <div class="input-group">
             <label>Логин</label>
             <div class="input-wrapper">
-                <input type="text" id="username" placeholder="Ваш логин">
+                <input type="text" id="username" placeholder="Введите ваш логин">
             </div>
         </div>
 
         <div class="input-group">
             <label>Пароль</label>
             <div class="input-wrapper">
-                <input type="password" id="password" placeholder="Ваш пароль">
+                <input type="password" id="password" placeholder="Введите ваш пароль">
                 <span class="toggle-pass" onclick="togglePassword()">👁️</span>
             </div>
         </div>
 
-        <button class="rule-btn" onclick="checkLogin()">Войти в систему</button>
+        <button class="rule-btn" onclick="checkLogin()">Войти</button>
         
         <div class="forgot-password">
-            Забыли пароль? Напишите нам в <br>
-            <a href="https://t.me/artemziv5" target="_blank">Telegram @artemziv5</a>
+            Забыли пароль? Напишите в телеграм <br>
+            <a href="https://t.me/artemziv5" target="_blank">@artemziv5</a>
         </div>
     </div>
 
     <div id="admin-panel" class="card hidden">
-        <h2 id="welcome-text">Админ-панель</h2>
+        <h2 id="welcome-text">Панель админа</h2>
         
         <div class="input-group">
-            <label>Нарушитель</label>
+            <label>ID НАРУШИТЕЛЯ</label>
             <input type="text" id="target_user" placeholder="ID или @username">
         </div>
 
         <div class="input-group">
-            <label>Время (мин)</label>
+            <label>СВОЁ ВРЕМЯ (МИНУТЫ)</label>
             <input type="number" id="custom_time" placeholder="Для кастомного мута">
         </div>
 
@@ -223,7 +219,7 @@
             "kisyna123": "sorokmura"
         };
 
-        // Инициализация при загрузке
+        // ПРОВЕРКА СОХРАНЕННОЙ СЕССИИ ПРИ ЗАГРУЗКЕ
         window.onload = function() {
             const savedUser = localStorage.getItem('myfine_session');
             if (savedUser && users[savedUser]) {
@@ -243,6 +239,8 @@
 
             if (users[user] && users[user] === pass) {
                 if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+                
+                // СОХРАНЕНИЕ УЧЕТНОЙ ЗАПИСИ
                 localStorage.setItem('myfine_session', user);
                 showPanel(user);
             } else {
@@ -260,6 +258,8 @@
 
         function logout() {
             if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+            
+            // УДАЛЕНИЕ СОХРАНЕННОЙ СЕССИИ
             localStorage.removeItem('myfine_session');
             location.reload();
         }
@@ -269,8 +269,7 @@
             const time = document.getElementById('custom_time').value.trim();
 
             if (!target) {
-                tg.showAlert("Укажите ID нарушителя!");
-                if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('warning');
+                tg.showAlert("Укажите нарушителя!");
                 return;
             }
 
