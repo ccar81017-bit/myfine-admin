@@ -190,16 +190,16 @@
         <button class="rule-btn" style="justify-content:center" onclick="checkLogin()">Войти</button>
         
         <div class="forgot-password" style="text-align:center; font-size:12px; margin-top:15px">
-            Нужен пароль? <a href="https://t.me/artemziv5" target="_blank" style="color:var(--primary); text-decoration:none">@artemziv5</a>
+            Если вы админ и забыли пароль пишите мне <a href="https://t.me/artemziv5" target="_blank" style="color:var(--primary); text-decoration:none">@artemziv5</a>
         </div>
     </div>
 
     <div id="admin-panel" class="card hidden">
-        <h2 id="welcome-text">Админ-панель</h2>
+        <h2 id="welcome-text">Админ-панель MyFine</h2>
         <div class="subtitle">Выдача ограничений доступа</div>
         
         <div class="input-group">
-            <label>Цель (ID / @username)</label>
+            <label>пользователь-(ID / @username)</label>
             <input type="text" id="target_user" placeholder="Например: 12345678">
         </div>
 
@@ -234,7 +234,7 @@
             <p style="margin-top:10px">⚠️ <i>Все действия логируются в базу данных администраторов.</i></p>
         </div>
         
-        <button class="logout-btn" onclick="logout()">Завершить сессию</button>
+        <button class="logout-btn" onclick="logout()">Выйти из аккаунта</button>
     </div>
 
     <script>
@@ -243,7 +243,7 @@
 
         const users = {
             "nullkotek": "garte454",
-            "kisyna123": "sorokmura"
+            "kisyna123": "kisyna"
         };
 
         function initTheme() {
