@@ -3,211 +3,235 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MyFine Admin Panel</title>
+    <title>MyFine Premium Admin</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
-            --primary: var(--tg-theme-button-color, #3390ec);
-            --primary-text: var(--tg-theme-button-text-color, #ffffff);
-            --bg: var(--tg-theme-bg-color, #f0f2f5);
-            --card-bg: var(--tg-theme-secondary-bg-color, #ffffff);
-            --text: var(--tg-theme-text-color, #222);
-            --hint: var(--tg-theme-hint-color, #999);
-            --error: #e74c3c;
+            /* Базовые переменные (Светлая тема по умолчанию) */
+            --primary: #3390ec;
+            --primary-gradient: linear-gradient(135deg, #3390ec 0%, #1c73c7 100%);
+            --bg: #f4f7f9;
+            --card-bg: #ffffff;
+            --text: #2c3e50;
+            --text-secondary: #7f8c8d;
+            --input-bg: #f8f9fa;
+            --border: #edf2f7;
+            --shadow: 0 10px 25px rgba(0,0,0,0.05);
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        [data-theme="dark"] {
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text: #f8fafc;
+            --text-secondary: #94a3b8;
+            --input-bg: #334155;
+            --border: #334155;
+            --shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; transition: all 0.3s ease; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Inter', -apple-system, sans-serif;
             background-color: var(--bg);
             color: var(--text);
             margin: 0;
             display: flex;
-            justify-content: center;
-            align-items: flex-start;
+            flex-direction: column;
+            align-items: center;
             min-height: 100vh;
             padding: 20px;
         }
 
-        .card {
+        /* Кнопка смены темы */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
             background: var(--card-bg);
-            border-radius: 20px;
-            padding: 24px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-            width: 100%;
-            max-width: 400px;
-            animation: fadeIn 0.3s ease-out;
+            border: 1px solid var(--border);
+            padding: 10px;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            font-size: 20px;
+            z-index: 100;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 420px;
+            border: 1px solid var(--border);
+            margin-top: 40px;
         }
 
         h2 { 
             text-align: center; 
-            color: var(--primary); 
-            margin: 0 0 24px 0;
-            font-size: 22px;
-            font-weight: 700;
+            margin: 0 0 10px 0;
+            font-size: 24px;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        .input-group { 
-            margin-bottom: 18px; 
-            position: relative;
+        .subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 30px;
         }
+
+        .input-group { margin-bottom: 20px; }
 
         label { 
             display: block; 
-            font-size: 12px; 
-            margin-bottom: 6px; 
-            font-weight: 600; 
-            color: var(--hint);
+            font-size: 11px; 
+            margin-bottom: 8px; 
+            font-weight: 700; 
+            color: var(--primary);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
         }
 
-        .input-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
+        .input-wrapper { position: relative; }
 
         input {
             width: 100%; 
-            padding: 12px 14px; 
-            border-radius: 12px;
-            border: 1.5px solid rgba(0,0,0,0.05); 
-            background: var(--bg);
+            padding: 14px 16px; 
+            border-radius: 14px;
+            border: 2px solid transparent; 
+            background: var(--input-bg);
             color: var(--text); 
             font-size: 16px;
             outline: none;
-            transition: border-color 0.2s;
         }
 
-        input:focus {
-            border-color: var(--primary);
-        }
+        input:focus { border-color: var(--primary); background: var(--card-bg); }
 
         .toggle-pass {
             position: absolute;
-            right: 12px;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
             cursor: pointer;
-            font-size: 18px;
-            user-select: none;
-            opacity: 0.6;
+            opacity: 0.5;
         }
 
         .rule-btn {
-            display: block; 
             width: 100%; 
-            padding: 14px; 
-            margin: 10px 0;
+            padding: 16px; 
+            margin: 12px 0;
             border: none; 
-            border-radius: 12px;
-            background-color: var(--primary);
-            color: var(--primary-text); 
-            font-weight: 600; 
-            font-size: 15px;
+            border-radius: 16px;
+            background: var(--primary-gradient);
+            color: white; 
+            font-weight: 700; 
+            font-size: 16px;
             cursor: pointer;
-            transition: transform 0.1s, opacity 0.2s;
+            box-shadow: 0 4px 15px rgba(51, 144, 236, 0.3);
         }
 
-        .rule-btn:active { 
-            transform: scale(0.98);
-            opacity: 0.9; 
+        .rule-btn:active { transform: scale(0.97); }
+
+        .btn-secondary {
+            background: var(--input-bg);
+            color: var(--text);
+            box-shadow: none;
+            border: 1px solid var(--border);
         }
+
+        .btn-orange { background: linear-gradient(135deg, #f39c12, #d35400); box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3); }
 
         .forgot-password {
             text-align: center;
             margin-top: 20px;
             font-size: 13px;
-            color: var(--hint);
+            color: var(--text-secondary);
         }
 
-        .forgot-password a {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 600;
-        }
+        .forgot-password a { color: var(--primary); text-decoration: none; font-weight: bold; }
 
         .logout-btn {
             background: transparent;
-            color: var(--error);
+            color: #e74c3c;
             border: none;
             width: 100%;
-            margin-top: 15px;
-            padding: 8px;
+            margin-top: 20px;
             cursor: pointer;
-            font-size: 13px;
-            font-weight: 500;
+            font-weight: 600;
         }
 
         .error-msg { 
-            color: var(--error); 
-            font-size: 13px; 
-            text-align: center; 
-            margin-bottom: 12px;
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 13px;
+            text-align: center;
+            margin-bottom: 15px;
             display: none;
         }
 
-        hr { border: 0; border-top: 1px solid rgba(0,0,0,0.05); margin: 20px 0; }
         .hidden { display: none; }
-        .btn-orange { background: #f39c12 !important; }
     </style>
 </head>
 <body>
 
+    <button class="theme-toggle" onclick="toggleTheme()" id="theme-icon">🌙</button>
+
     <div id="login-screen" class="card">
-        <h2>Вход в MyFine ✨</h2>
-        <div id="login-error" class="error-msg">Неверный логин или пароль</div>
+        <h2>MyFine Admin</h2>
+        <div class="subtitle">Управление правопорядком системы</div>
+        
+        <div id="login-error" class="error-msg">Ошибка доступа: проверьте данные</div>
         
         <div class="input-group">
-            <label>Логин</label>
-            <div class="input-wrapper">
-                <input type="text" id="username" placeholder="Введите ваш логин">
-            </div>
+            <label>Логин администратора</label>
+            <input type="text" id="username" placeholder="Admin username">
         </div>
 
         <div class="input-group">
-            <label>Пароль</label>
+            <label>Пароль доступа</label>
             <div class="input-wrapper">
-                <input type="password" id="password" placeholder="Введите ваш пароль">
+                <input type="password" id="password" placeholder="••••••••">
                 <span class="toggle-pass" onclick="togglePassword()">👁️</span>
             </div>
         </div>
 
-        <button class="rule-btn" onclick="checkLogin()">Войти</button>
+        <button class="rule-btn" onclick="checkLogin()">Авторизоваться</button>
         
         <div class="forgot-password">
-            Забыли пароль? Напишите в телеграм <br>
+            Нужен доступ? Свяжитесь с <br>
             <a href="https://t.me/artemziv5" target="_blank">@artemziv5</a>
         </div>
     </div>
 
     <div id="admin-panel" class="card hidden">
         <h2 id="welcome-text">Панель админа</h2>
+        <div class="subtitle">Выберите меру наказания</div>
         
         <div class="input-group">
-            <label>ID НАРУШИТЕЛЯ</label>
-            <input type="text" id="target_user" placeholder="ID или @username">
+            <label>Цель (User ID / @username)</label>
+            <input type="text" id="target_user" placeholder="Например: 12345678">
         </div>
 
         <div class="input-group">
-            <label>СВОЁ ВРЕМЯ (МИНУТЫ)</label>
-            <input type="number" id="custom_time" placeholder="Для кастомного мута">
+            <label>Длительность (минуты)</label>
+            <input type="number" id="custom_time" placeholder="60">
         </div>
 
-        <hr>
+        <div style="margin-top: 25px;">
+            <button class="rule-btn btn-secondary" onclick="sendRule('1')">🤬 Нецензурная лексика</button>
+            <button class="rule-btn btn-secondary" onclick="sendRule('2')">🚫 Оскорбления</button>
+            <button class="rule-btn btn-secondary" onclick="sendRule('3')">🛑 Массовый спам</button>
+            <button class="rule-btn btn-orange" onclick="sendRule('custom')">⚡ Применить кастомное</button>
+        </div>
         
-        <button class="rule-btn" onclick="sendRule('1')">🤬 Мат (3 часа)</button>
-        <button class="rule-btn" onclick="sendRule('2')">🚫 Оскорбления (5 часов)</button>
-        <button class="rule-btn" onclick="sendRule('3')">🛑 Спам (2 часа)</button>
-        <button class="rule-btn" onclick="sendRule('5')">ℹ️ Оффтоп (Варн)</button>
-        <button class="rule-btn btn-orange" onclick="sendRule('custom')">⚡ Применить кастомное</button>
-        
-        <button class="logout-btn" onclick="logout()">Выйти из профиля</button>
+        <button class="logout-btn" onclick="logout()">Завершить сессию</button>
     </div>
 
     <script>
@@ -219,8 +243,24 @@
             "kisyna123": "sorokmura"
         };
 
-        // ПРОВЕРКА СОХРАНЕННОЙ СЕССИИ ПРИ ЗАГРУЗКЕ
+        // Темы
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            document.getElementById('theme-icon').innerText = savedTheme === 'light' ? '🌙' : '☀️';
+        }
+
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const target = current === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', target);
+            localStorage.setItem('theme', target);
+            document.getElementById('theme-icon').innerText = target === 'light' ? '🌙' : '☀️';
+            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+        }
+
         window.onload = function() {
+            initTheme();
             const savedUser = localStorage.getItem('myfine_session');
             if (savedUser && users[savedUser]) {
                 showPanel(savedUser);
@@ -239,8 +279,6 @@
 
             if (users[user] && users[user] === pass) {
                 if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-                
-                // СОХРАНЕНИЕ УЧЕТНОЙ ЗАПИСИ
                 localStorage.setItem('myfine_session', user);
                 showPanel(user);
             } else {
@@ -253,13 +291,11 @@
         function showPanel(name) {
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('admin-panel').classList.remove('hidden');
-            document.getElementById('welcome-text').innerText = "Привет, " + name + "!";
+            document.getElementById('welcome-text').innerText = "Привет, " + name;
         }
 
         function logout() {
             if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
-            
-            // УДАЛЕНИЕ СОХРАНЕННОЙ СЕССИИ
             localStorage.removeItem('myfine_session');
             location.reload();
         }
@@ -269,18 +305,11 @@
             const time = document.getElementById('custom_time').value.trim();
 
             if (!target) {
-                tg.showAlert("Укажите нарушителя!");
+                tg.showAlert("Введите ID нарушителя!");
                 return;
             }
 
-            const data = {
-                action: 'mute',
-                target: target,
-                rule: ruleId,
-                custom_minutes: time
-            };
-
-            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+            const data = { action: 'mute', target: target, rule: ruleId, custom_minutes: time };
             tg.sendData(JSON.stringify(data));
             tg.close();
         }
