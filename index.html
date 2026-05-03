@@ -51,6 +51,18 @@
         }
         .rule-btn:active { opacity: 0.7; }
         
+        .forgot-password {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 13px;
+            opacity: 0.8;
+        }
+        .forgot-password a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
         .logout-btn {
             background: transparent;
             color: #e74c3c;
@@ -79,6 +91,10 @@
             <input type="password" id="password" placeholder="Введите пароль">
         </div>
         <button class="rule-btn" onclick="checkLogin()">Войти</button>
+        
+        <div class="forgot-password">
+            Забыли пароль? Напишите в телеграм <a href="https://t.me/artemziv5" target="_blank">@artemziv5</a>
+        </div>
     </div>
 
     <div id="admin-panel" class="card hidden">
@@ -114,7 +130,6 @@
             "kisyna123": "sorokmura"
         };
 
-        // 1. ПРОВЕРКА ПРИ ЗАГРУЗКЕ: если логин сохранен, заходим сразу
         window.onload = function() {
             const savedUser = localStorage.getItem('myfine_auth');
             if (savedUser && users[savedUser]) {
@@ -128,7 +143,6 @@
             const err = document.getElementById('login-error');
 
             if (users[user] && users[user] === pass) {
-                // 2. СОХРАНЕНИЕ: записываем логин в локальную память
                 localStorage.setItem('myfine_auth', user);
                 renderAdminPanel(user);
             } else {
@@ -142,10 +156,9 @@
             document.getElementById('welcome-text').innerText = "Привет, " + username + "!";
         }
 
-        // 3. ФУНКЦИЯ ВЫХОДА: очистка памяти
         function logout() {
             localStorage.removeItem('myfine_auth');
-            location.reload(); // Перезагружаем страницу, чтобы вернуться на экран входа
+            location.reload();
         }
 
         function sendRule(ruleId) {
