@@ -7,16 +7,17 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
-            /* Базовые переменные (Светлая тема по умолчанию) */
+            /* Улучшенная "светлая" тема (сделана слегка темнее/мягче) */
             --primary: #3390ec;
             --primary-gradient: linear-gradient(135deg, #3390ec 0%, #1c73c7 100%);
-            --bg: #f4f7f9;
-            --card-bg: #ffffff;
-            --text: #2c3e50;
-            --text-secondary: #7f8c8d;
-            --input-bg: #f8f9fa;
-            --border: #edf2f7;
-            --shadow: 0 10px 25px rgba(0,0,0,0.05);
+            --bg: #e2e8f0; /* Слегка темнее, чем чистый белый */
+            --card-bg: #f8fafc;
+            --text: #1e293b;
+            --text-secondary: #64748b;
+            --input-bg: #f1f5f9;
+            --border: #cbd5e1;
+            --shadow: 0 10px 25px rgba(0,0,0,0.08);
+            --accent-orange: linear-gradient(135deg, #f39c12, #d35400);
         }
 
         [data-theme="dark"] {
@@ -29,7 +30,7 @@
             --shadow: 0 10px 25px rgba(0,0,0,0.3);
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; transition: all 0.3s ease; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; transition: all 0.2s ease; }
 
         body {
             font-family: 'Inter', -apple-system, sans-serif;
@@ -43,7 +44,6 @@
             padding: 20px;
         }
 
-        /* Кнопка смены темы */
         .theme-toggle {
             position: absolute;
             top: 20px;
@@ -61,7 +61,7 @@
         .card {
             background: var(--card-bg);
             border-radius: 24px;
-            padding: 30px;
+            padding: 25px;
             box-shadow: var(--shadow);
             width: 100%;
             max-width: 420px;
@@ -71,8 +71,8 @@
 
         h2 { 
             text-align: center; 
-            margin: 0 0 10px 0;
-            font-size: 24px;
+            margin: 0 0 5px 0;
+            font-size: 22px;
             background: var(--primary-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -81,28 +81,26 @@
         .subtitle {
             text-align: center;
             color: var(--text-secondary);
-            font-size: 14px;
-            margin-bottom: 30px;
+            font-size: 13px;
+            margin-bottom: 25px;
         }
 
-        .input-group { margin-bottom: 20px; }
+        .input-group { margin-bottom: 15px; }
 
         label { 
             display: block; 
             font-size: 11px; 
-            margin-bottom: 8px; 
+            margin-bottom: 6px; 
             font-weight: 700; 
             color: var(--primary);
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
         }
-
-        .input-wrapper { position: relative; }
 
         input {
             width: 100%; 
-            padding: 14px 16px; 
-            border-radius: 14px;
+            padding: 12px 16px; 
+            border-radius: 12px;
             border: 2px solid transparent; 
             background: var(--input-bg);
             color: var(--text); 
@@ -110,50 +108,50 @@
             outline: none;
         }
 
-        input:focus { border-color: var(--primary); background: var(--card-bg); }
+        input:focus { border-color: var(--primary); }
 
-        .toggle-pass {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            opacity: 0.5;
-        }
-
+        /* Стили кнопок */
         .rule-btn {
             width: 100%; 
-            padding: 16px; 
-            margin: 12px 0;
+            padding: 14px; 
+            margin: 8px 0;
             border: none; 
-            border-radius: 16px;
+            border-radius: 14px;
             background: var(--primary-gradient);
             color: white; 
             font-weight: 700; 
-            font-size: 16px;
+            font-size: 15px;
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(51, 144, 236, 0.3);
+            box-shadow: 0 4px 12px rgba(51, 144, 236, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .rule-btn:active { transform: scale(0.97); }
+        .rule-btn:active { transform: scale(0.98); }
 
-        .btn-secondary {
-            background: var(--input-bg);
-            color: var(--text);
-            box-shadow: none;
-            border: 1px solid var(--border);
-        }
+        .btn-orange { background: var(--accent-orange); }
 
-        .btn-orange { background: linear-gradient(135deg, #f39c12, #d35400); box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3); }
-
-        .forgot-password {
-            text-align: center;
+        /* Список правил и справка */
+        .info-box {
+            background: rgba(51, 144, 236, 0.05);
+            border: 1px dashed var(--primary);
+            border-radius: 12px;
+            padding: 15px;
             margin-top: 20px;
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-secondary);
+            line-height: 1.5;
         }
 
-        .forgot-password a { color: var(--primary); text-decoration: none; font-weight: bold; }
+        .info-box b { color: var(--text); }
+
+        .rules-list {
+            margin-top: 10px;
+            padding-left: 15px;
+        }
+
+        .rules-list li { margin-bottom: 5px; }
 
         .logout-btn {
             background: transparent;
@@ -163,20 +161,11 @@
             margin-top: 20px;
             cursor: pointer;
             font-weight: 600;
-        }
-
-        .error-msg { 
-            background: rgba(231, 76, 60, 0.1);
-            color: #e74c3c;
-            padding: 10px;
-            border-radius: 10px;
             font-size: 13px;
-            text-align: center;
-            margin-bottom: 15px;
-            display: none;
         }
 
         .hidden { display: none; }
+        .error-msg { color: #e74c3c; font-size: 12px; text-align: center; margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -184,51 +173,65 @@
     <button class="theme-toggle" onclick="toggleTheme()" id="theme-icon">🌙</button>
 
     <div id="login-screen" class="card">
-        <h2>MyFine Admin</h2>
-        <div class="subtitle">Управление правопорядком системы</div>
-        
-        <div id="login-error" class="error-msg">Ошибка доступа: проверьте данные</div>
+        <h2>MyFine Login</h2>
+        <div class="subtitle">Панель управления правопорядком</div>
+        <div id="login-error" class="error-msg" style="display:none">Ошибка доступа: проверьте данные</div>
         
         <div class="input-group">
-            <label>Логин администратора</label>
+            <label>Логин</label>
             <input type="text" id="username" placeholder="Admin username">
         </div>
 
         <div class="input-group">
-            <label>Пароль доступа</label>
-            <div class="input-wrapper">
-                <input type="password" id="password" placeholder="••••••••">
-                <span class="toggle-pass" onclick="togglePassword()">👁️</span>
-            </div>
+            <label>Пароль</label>
+            <input type="password" id="password" placeholder="••••••••">
         </div>
 
-        <button class="rule-btn" onclick="checkLogin()">Авторизоваться</button>
+        <button class="rule-btn" style="justify-content:center" onclick="checkLogin()">Войти</button>
         
-        <div class="forgot-password">
-            Нужен доступ? Свяжитесь с <br>
-            <a href="https://t.me/artemziv5" target="_blank">@artemziv5</a>
+        <div class="forgot-password" style="text-align:center; font-size:12px; margin-top:15px">
+            Нужен пароль? <a href="https://t.me/artemziv5" target="_blank" style="color:var(--primary); text-decoration:none">@artemziv5</a>
         </div>
     </div>
 
     <div id="admin-panel" class="card hidden">
-        <h2 id="welcome-text">Панель админа</h2>
-        <div class="subtitle">Выберите меру наказания</div>
+        <h2 id="welcome-text">Админ-панель</h2>
+        <div class="subtitle">Выдача ограничений доступа</div>
         
         <div class="input-group">
-            <label>Цель (User ID / @username)</label>
+            <label>Цель (ID / @username)</label>
             <input type="text" id="target_user" placeholder="Например: 12345678">
         </div>
 
         <div class="input-group">
-            <label>Длительность (минуты)</label>
+            <label>Своё время (минуты)</label>
             <input type="number" id="custom_time" placeholder="60">
         </div>
 
-        <div style="margin-top: 25px;">
-            <button class="rule-btn btn-secondary" onclick="sendRule('1')">🤬 Нецензурная лексика</button>
-            <button class="rule-btn btn-secondary" onclick="sendRule('2')">🚫 Оскорбления</button>
-            <button class="rule-btn btn-secondary" onclick="sendRule('3')">🛑 Массовый спам</button>
-            <button class="rule-btn btn-orange" onclick="sendRule('custom')">⚡ Применить кастомное</button>
+        <hr style="border: 0; border-top: 1px solid var(--border); margin: 20px 0;">
+        
+        <button class="rule-btn" onclick="sendRule('1')">
+            <span>🤬 Мат</span> <span>3ч</span>
+        </button>
+        <button class="rule-btn" onclick="sendRule('2')">
+            <span>🚫 Оскорбления</span> <span>5ч</span>
+        </button>
+        <button class="rule-btn" onclick="sendRule('3')">
+            <span>🛑 Спам</span> <span>2ч</span>
+        </button>
+        <button class="rule-btn btn-orange" onclick="sendRule('custom')">
+            <span>⚡ Кастомный мут</span> <span>Auto</span>
+        </button>
+
+        <div class="info-box">
+            <b>📖 Справочник команд:</b>
+            <div class="rules-list">
+                <li><b>Мат:</b> Ограничение чата за мат в любом проявлении.</li>
+                <li><b>Оскорбления:</b> Задевание чести и достоинства участников.</li>
+                <li><b>Спам:</b> Флуд, ссылки или более 3 одинаковых сообщений.</li>
+                <li><b>Кастом:</b> Использует время из поля "Своё время".</li>
+            </div>
+            <p style="margin-top:10px">⚠️ <i>Все действия логируются в базу данных администраторов.</i></p>
         </div>
         
         <button class="logout-btn" onclick="logout()">Завершить сессию</button>
@@ -243,7 +246,6 @@
             "kisyna123": "sorokmura"
         };
 
-        // Темы
         function initTheme() {
             const savedTheme = localStorage.getItem('theme') || 'light';
             document.documentElement.setAttribute('data-theme', savedTheme);
@@ -266,11 +268,6 @@
                 showPanel(savedUser);
             }
         };
-
-        function togglePassword() {
-            const p = document.getElementById('password');
-            p.type = p.type === 'password' ? 'text' : 'password';
-        }
 
         function checkLogin() {
             const user = document.getElementById('username').value.trim();
@@ -305,7 +302,7 @@
             const time = document.getElementById('custom_time').value.trim();
 
             if (!target) {
-                tg.showAlert("Введите ID нарушителя!");
+                tg.showAlert("Укажите ID цели!");
                 return;
             }
 
