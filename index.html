@@ -3,311 +3,228 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MyFine Premium Admin</title>
+    <title>MyFine Premium Panel</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            /* Улучшенная "светлая" тема (сделана слегка темнее/мягче) */
-            --primary: #3390ec;
-            --primary-gradient: linear-gradient(135deg, #3390ec 0%, #1c73c7 100%);
-            --bg: #e2e8f0; /* Слегка темнее, чем чистый белый */
-            --card-bg: #f8fafc;
-            --text: #1e293b;
-            --text-secondary: #64748b;
-            --input-bg: #f1f5f9;
-            --border: #cbd5e1;
-            --shadow: 0 10px 25px rgba(0,0,0,0.08);
-            --accent-orange: linear-gradient(135deg, #f39c12, #d35400);
+            --bg-color: #0f121a;
+            --card-bg: rgba(23, 28, 41, 0.8);
+            --accent-blue: #0088cc;
+            --accent-purple: #6a5acd;
+            --text-main: #ffffff;
+            --text-dim: #94a3b8;
+            --danger: #ff4d4d;
+            --warning: #ffb84d;
+            --success: #2ecc71;
         }
-
-        [data-theme="dark"] {
-            --bg: #0f172a;
-            --card-bg: #1e293b;
-            --text: #f8fafc;
-            --text-secondary: #94a3b8;
-            --input-bg: #334155;
-            --border: #334155;
-            --shadow: 0 10px 25px rgba(0,0,0,0.3);
-        }
-
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; transition: all 0.2s ease; }
 
         body {
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle at top right, #1a1f35, #0f121a);
+            color: var(--text-main);
             font-family: 'Inter', -apple-system, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
             margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
+            padding: 16px;
+            overflow-x: hidden;
         }
 
-        .theme-toggle {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            padding: 10px;
-            border-radius: 12px;
-            cursor: pointer;
-            box-shadow: var(--shadow);
-            font-size: 20px;
-            z-index: 100;
+        .header {
+            text-align: center;
+            padding: 20px 0;
+            animation: fadeInDown 0.8s ease;
         }
 
-        .card {
-            background: var(--card-bg);
-            border-radius: 24px;
-            padding: 25px;
-            box-shadow: var(--shadow);
-            width: 100%;
-            max-width: 420px;
-            border: 1px solid var(--border);
-            margin-top: 40px;
-        }
-
-        h2 { 
-            text-align: center; 
-            margin: 0 0 5px 0;
-            font-size: 22px;
-            background: var(--primary-gradient);
+        .header h1 {
+            font-size: 26px;
+            background: linear-gradient(90deg, #fff, var(--accent-blue));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            margin: 0;
         }
 
-        .subtitle {
-            text-align: center;
-            color: var(--text-secondary);
+        /* Список админов с эффектом стекла */
+        .admin-section {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .admin-chip {
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 8px 15px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
             font-size: 13px;
-            margin-bottom: 25px;
+            backdrop-filter: blur(10px);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .dot-on { background: var(--success); box-shadow: 0 0 10px var(--success); }
+        .dot-off { background: #555; }
+
+        /* Карточки управления */
+        .card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(255,255,255,0.05);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: transform 0.2s;
+        }
+
+        h3 {
+            font-size: 14px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 0 0 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .input-group { margin-bottom: 15px; }
 
-        label { 
-            display: block; 
-            font-size: 11px; 
-            margin-bottom: 6px; 
-            font-weight: 700; 
-            color: var(--primary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
         input {
-            width: 100%; 
-            padding: 12px 16px; 
-            border-radius: 12px;
-            border: 2px solid transparent; 
-            background: var(--input-bg);
-            color: var(--text); 
-            font-size: 16px;
-            outline: none;
-        }
-
-        input:focus { border-color: var(--primary); }
-
-        /* Стили кнопок */
-        .rule-btn {
-            width: 100%; 
-            padding: 14px; 
-            margin: 8px 0;
-            border: none; 
-            border-radius: 14px;
-            background: var(--primary-gradient);
-            color: white; 
-            font-weight: 700; 
-            font-size: 15px;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(51, 144, 236, 0.2);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .rule-btn:active { transform: scale(0.98); }
-
-        .btn-orange { background: var(--accent-orange); }
-
-        /* Список правил и справка */
-        .info-box {
-            background: rgba(51, 144, 236, 0.05);
-            border: 1px dashed var(--primary);
-            border-radius: 12px;
-            padding: 15px;
-            margin-top: 20px;
-            font-size: 12px;
-            color: var(--text-secondary);
-            line-height: 1.5;
-        }
-
-        .info-box b { color: var(--text); }
-
-        .rules-list {
-            margin-top: 10px;
-            padding-left: 15px;
-        }
-
-        .rules-list li { margin-bottom: 5px; }
-
-        .logout-btn {
-            background: transparent;
-            color: #e74c3c;
-            border: none;
             width: 100%;
-            margin-top: 20px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 13px;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 14px;
+            color: white;
+            font-size: 15px;
+            box-sizing: border-box;
+            transition: 0.3s;
         }
 
-        .hidden { display: none; }
-        .error-msg { color: #e74c3c; font-size: 12px; text-align: center; margin-bottom: 10px; }
+        input:focus { border-color: var(--accent-blue); outline: none; background: rgba(0,0,0,0.4); }
+
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+        button {
+            border: none;
+            border-radius: 12px;
+            padding: 14px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: 0.3s;
+            color: white;
+        }
+
+        .btn-primary { background: linear-gradient(135deg, var(--accent-blue), #0055ff); }
+        .btn-warning { background: linear-gradient(135deg, var(--warning), #e67e22); color: #000; }
+        .btn-success { background: linear-gradient(135deg, var(--success), #27ae60); width: 100%; }
+
+        button:active { transform: scale(0.95); opacity: 0.9; }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Кастомный скроллбар */
+        ::-webkit-scrollbar { height: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--accent-blue); border-radius: 10px; }
     </style>
 </head>
 <body>
 
-    <button class="theme-toggle" onclick="toggleTheme()" id="theme-icon">🌙</button>
+    <div class="header">
+        <h1>MyFine ✨ Edition</h1>
+    </div>
 
-    <div id="login-screen" class="card">
-        <h2>MyFine Login</h2>
-        <div class="subtitle">Панель управления правопорядком</div>
-        <div id="login-error" class="error-msg" style="display:none">Ошибка доступа: проверьте данные</div>
-        
-        <div class="input-group">
-            <label>Логин</label>
-            <input type="text" id="username" placeholder="Admin username">
+    <div class="admin-section" id="admin_list">
         </div>
 
+    <div class="card">
+        <h3><i class="fas fa-shield-halved"></i> Контроль игроков</h3>
         <div class="input-group">
-            <label>Пароль</label>
-            <input type="password" id="password" placeholder="••••••••">
+            <input type="text" id="target_user" placeholder="Никнейм или Telegram ID">
         </div>
-
-        <button class="rule-btn" style="justify-content:center" onclick="checkLogin()">Войти</button>
-        
-        <div class="forgot-password" style="text-align:center; font-size:12px; margin-top:15px">
-            Если вы админ и забыли пароль пишите мне <a href="https://t.me/artemziv5" target="_blank" style="color:var(--primary); text-decoration:none">@artemziv5</a>
+        <div class="btn-grid">
+            <button class="btn-warning" onclick="sendAction('warn')">
+                <i class="fas fa-triangle-exclamation"></i> ВАРН
+            </button>
+            <button class="btn-primary" onclick="showMuteField()">
+                <i class="fas fa-comment-slash"></i> МУТ
+            </button>
+        </div>
+        <div id="mute_controls" style="display:none; margin-top:15px;">
+            <input type="number" id="mute_time" placeholder="Минуты">
+            <button class="btn-primary" style="margin-top:10px; width:100%" onclick="sendAction('mute')">ПОДТВЕРДИТЬ МУТ</button>
         </div>
     </div>
 
-    <div id="admin-panel" class="card hidden">
-        <h2 id="welcome-text">Админ-панель MyFine</h2>
-        <div class="subtitle">Выдача ограничений доступа</div>
-        
+    <div class="card">
+        <h3><i class="fas fa-paper-plane"></i> Глобальная рассылка</h3>
         <div class="input-group">
-            <label>пользователь-(ID / @username)</label>
-            <input type="text" id="target_user" placeholder="Например: 12345678">
+            <input type="text" id="bc_msg" placeholder="Текст вашего сообщения...">
         </div>
-
-        <div class="input-group">
-            <label>Своё время (минуты)</label>
-            <input type="number" id="custom_time" placeholder="60">
-        </div>
-
-        <hr style="border: 0; border-top: 1px solid var(--border); margin: 20px 0;">
-        
-        <button class="rule-btn" onclick="sendRule('1')">
-            <span>🤬 Мат</span> <span>3ч</span>
+        <button class="btn-success" onclick="sendAction('broadcast')">
+            <i class="fas fa-broadcast-tower"></i> ОТПРАВИТЬ ВСЕМ
         </button>
-        <button class="rule-btn" onclick="sendRule('2')">
-            <span>🚫 Оскорбления</span> <span>5ч</span>
-        </button>
-        <button class="rule-btn" onclick="sendRule('3')">
-            <span>🛑 Спам</span> <span>2ч</span>
-        </button>
-        <button class="rule-btn btn-orange" onclick="sendRule('custom')">
-            <span>⚡ Кастомный мут</span> <span>Auto</span>
-        </button>
-
-        <div class="info-box">
-            <b>📖 Справочник команд:</b>
-            <div class="rules-list">
-                <li><b>Мат:</b> Ограничение чата за мат в любом проявлении.</li>
-                <li><b>Оскорбления:</b> Задевание чести и достоинства участников.</li>
-                <li><b>Спам:</b> Флуд, ссылки или более 3 одинаковых сообщений.</li>
-                <li><b>Кастом:</b> Использует время из поля "Своё время".</li>
-            </div>
-            <p style="margin-top:10px">⚠️ <i>Все действия логируются в базу данных администраторов.</i></p>
-        </div>
-        
-        <button class="logout-btn" onclick="logout()">Выйти из аккаунта</button>
     </div>
 
     <script>
-        const tg = window.Telegram.WebApp;
+        let tg = window.Telegram.WebApp;
         tg.expand();
+        tg.MainButton.setParams({ text: "ЗАКРЫТЬ ПАНЕЛЬ", color: "#2c3e50" });
+        tg.MainButton.show();
+        tg.MainButton.onClick(() => tg.close());
 
-        const users = {
-            "nullkotek": "garte454",
-            "kisyna123": "kisyna"
-        };
-
-        function initTheme() {
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            document.documentElement.setAttribute('data-theme', savedTheme);
-            document.getElementById('theme-icon').innerText = savedTheme === 'light' ? '🌙' : '☀️';
-        }
-
-        function toggleTheme() {
-            const current = document.documentElement.getAttribute('data-theme');
-            const target = current === 'light' ? 'dark' : 'light';
-            document.documentElement.setAttribute('data-theme', target);
-            localStorage.setItem('theme', target);
-            document.getElementById('theme-icon').innerText = target === 'light' ? '🌙' : '☀️';
-            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
-        }
-
+        // Получение админов из URL
         window.onload = function() {
-            initTheme();
-            const savedUser = localStorage.getItem('myfine_session');
-            if (savedUser && users[savedUser]) {
-                showPanel(savedUser);
+            const params = new URLSearchParams(window.location.search);
+            const data = params.get('admins');
+            if(data) {
+                const admins = JSON.parse(decodeURIComponent(data));
+                const container = document.getElementById('admin_list');
+                container.innerHTML = admins.map(a => `
+                    <div class="admin-chip">
+                        <span class="status-dot ${a.online ? 'dot-on' : 'dot-off'}"></span>
+                        ${a.login}
+                    </div>
+                `).join('');
             }
         };
 
-        function checkLogin() {
-            const user = document.getElementById('username').value.trim();
-            const pass = document.getElementById('password').value.trim();
-            const err = document.getElementById('login-error');
+        function showMuteField() {
+            document.getElementById('mute_controls').style.display = 'block';
+        }
 
-            if (users[user] && users[user] === pass) {
-                if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-                localStorage.setItem('myfine_session', user);
-                showPanel(user);
-            } else {
-                if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
-                err.style.display = 'block';
-                setTimeout(() => { err.style.display = 'none'; }, 3000);
+        function sendAction(type) {
+            let res = { action: type };
+            if(type === 'warn') res.user = document.getElementById('target_user').value;
+            if(type === 'mute') {
+                res.user = document.getElementById('target_user').value;
+                res.time = document.getElementById('mute_time').value;
             }
-        }
+            if(type === 'broadcast') res.text = document.getElementById('bc_msg').value;
 
-        function showPanel(name) {
-            document.getElementById('login-screen').classList.add('hidden');
-            document.getElementById('admin-panel').classList.remove('hidden');
-            document.getElementById('welcome-text').innerText = "Привет, " + name;
-        }
-
-        function logout() {
-            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
-            localStorage.removeItem('myfine_session');
-            location.reload();
-        }
-
-        function sendRule(ruleId) {
-            const target = document.getElementById('target_user').value.trim();
-            const time = document.getElementById('custom_time').value.trim();
-
-            if (!target) {
-                tg.showAlert("Укажите ID цели!");
-                return;
+            if(!res.user && type !== 'broadcast') {
+                tg.HapticFeedback.notificationOccurred('error');
+                return alert("Укажите цель!");
             }
-
-            const data = { action: 'mute', target: target, rule: ruleId, custom_minutes: time };
-            tg.sendData(JSON.stringify(data));
+            
+            tg.HapticFeedback.impactOccurred('medium');
+            tg.sendData(JSON.stringify(res));
             tg.close();
         }
     </script>
