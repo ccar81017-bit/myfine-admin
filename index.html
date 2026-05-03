@@ -2,123 +2,216 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>MyFine Admin Panel</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
             --primary: var(--tg-theme-button-color, #3390ec);
-            --text: var(--tg-theme-text-color, #222);
+            --primary-text: var(--tg-theme-button-text-color, #ffffff);
             --bg: var(--tg-theme-bg-color, #f0f2f5);
             --card-bg: var(--tg-theme-secondary-bg-color, #ffffff);
+            --text: var(--tg-theme-text-color, #222);
+            --hint: var(--tg-theme-hint-color, #999);
+            --error: #e74c3c;
+            --success: #2ecc71;
         }
 
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
         body {
-            font-family: 'Segoe UI', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg);
             color: var(--text);
             margin: 0;
-            padding: 15px;
             display: flex;
             justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 20px;
         }
 
         .card {
             background: var(--card-bg);
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
             width: 100%;
             max-width: 400px;
-            box-sizing: border-box;
+            animation: fadeIn 0.3s ease-out;
         }
 
-        h2 { text-align: center; color: var(--primary); margin-bottom: 20px; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-        .input-group { margin-bottom: 15px; }
-        label { display: block; font-size: 11px; margin-bottom: 5px; font-weight: bold; opacity: 0.7; }
+        h2 { 
+            text-align: center; 
+            color: var(--primary); 
+            margin: 0 0 24px 0;
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .input-group { 
+            margin-bottom: 18px; 
+            position: relative;
+        }
+
+        label { 
+            display: block; 
+            font-size: 12px; 
+            margin-bottom: 6px; 
+            font-weight: 600; 
+            color: var(--hint);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
         input {
-            width: 100%; padding: 12px; border-radius: 8px;
-            border: 1px solid #ccc; background: var(--bg);
-            color: var(--text); box-sizing: border-box; outline: none;
+            width: 100%; 
+            padding: 12px 14px; 
+            border-radius: 12px;
+            border: 1.5px solid rgba(0,0,0,0.05); 
+            background: var(--bg);
+            color: var(--text); 
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+        }
+
+        .toggle-pass {
+            position: absolute;
+            right: 12px;
+            cursor: pointer;
+            font-size: 18px;
+            user-select: none;
+            opacity: 0.6;
         }
 
         .rule-btn {
-            display: block; width: 100%; padding: 12px; margin: 8px 0;
-            border: none; border-radius: 10px;
+            display: block; 
+            width: 100%; 
+            padding: 14px; 
+            margin: 10px 0;
+            border: none; 
+            border-radius: 12px;
             background-color: var(--primary);
-            color: #fff; font-weight: bold; cursor: pointer;
+            color: var(--primary-text); 
+            font-weight: 600; 
+            font-size: 15px;
+            cursor: pointer;
+            transition: transform 0.1s, opacity 0.2s;
         }
-        .rule-btn:active { opacity: 0.7; }
-        
+
+        .rule-btn:active { 
+            transform: scale(0.98);
+            opacity: 0.9; 
+        }
+
         .forgot-password {
             text-align: center;
-            margin-top: 15px;
+            margin-top: 20px;
             font-size: 13px;
-            opacity: 0.8;
+            color: var(--hint);
         }
+
         .forgot-password a {
             color: var(--primary);
             text-decoration: none;
-            font-weight: bold;
+            font-weight: 600;
         }
 
         .logout-btn {
             background: transparent;
-            color: #e74c3c;
+            color: var(--error);
             border: none;
             width: 100%;
-            margin-top: 10px;
+            margin-top: 15px;
+            padding: 8px;
             cursor: pointer;
             font-size: 13px;
+            font-weight: 500;
         }
 
+        .error-msg { 
+            color: var(--error); 
+            font-size: 13px; 
+            text-align: center; 
+            margin-bottom: 12px;
+            display: none;
+        }
+
+        hr { border: 0; border-top: 1px solid rgba(0,0,0,0.05); margin: 20px 0; }
+
         .hidden { display: none; }
-        .error { color: #e74c3c; font-size: 12px; text-align: center; margin-bottom: 10px; }
+
+        /* Специальный стиль для кастомной кнопки */
+        .btn-orange { background: #f39c12 !important; }
     </style>
 </head>
 <body>
 
     <div id="login-screen" class="card">
-        <h2>Вход в MyFine ✨</h2>
-        <div id="login-error" class="error"></div>
+        <h2>MyFine ✨</h2>
+        <div id="login-error" class="error-msg">Неверный логин или пароль</div>
+        
         <div class="input-group">
-            <label>ЛОГИН</label>
-            <input type="text" id="username" placeholder="Введите логин">
+            <label>Логин</label>
+            <div class="input-wrapper">
+                <input type="text" id="username" placeholder="Ваш логин">
+            </div>
         </div>
+
         <div class="input-group">
-            <label>ПАРОЛЬ</label>
-            <input type="password" id="password" placeholder="Введите пароль">
+            <label>Пароль</label>
+            <div class="input-wrapper">
+                <input type="password" id="password" placeholder="Ваш пароль">
+                <span class="toggle-pass" onclick="togglePassword()">👁️</span>
+            </div>
         </div>
-        <button class="rule-btn" onclick="checkLogin()">Войти</button>
+
+        <button class="rule-btn" onclick="checkLogin()">Войти в систему</button>
         
         <div class="forgot-password">
-            Забыли пароль? Напишите в телеграм <a href="https://t.me/artemziv5" target="_blank">@artemziv5</a>
+            Забыли пароль? Напишите нам в <br>
+            <a href="https://t.me/artemziv5" target="_blank">Telegram @artemziv5</a>
         </div>
     </div>
 
     <div id="admin-panel" class="card hidden">
-        <h2 id="welcome-text">Панель админа</h2>
+        <h2 id="welcome-text">Админ-панель</h2>
         
         <div class="input-group">
-            <label>ID НАРУШИТЕЛЯ</label>
+            <label>Нарушитель</label>
             <input type="text" id="target_user" placeholder="ID или @username">
         </div>
 
         <div class="input-group">
-            <label>СВОЁ ВРЕМЯ (МИНУТЫ)</label>
+            <label>Время (мин)</label>
             <input type="number" id="custom_time" placeholder="Для кастомного мута">
         </div>
 
-        <hr style="opacity: 0.2; margin: 20px 0;">
+        <hr>
         
         <button class="rule-btn" onclick="sendRule('1')">🤬 Мат (3 часа)</button>
         <button class="rule-btn" onclick="sendRule('2')">🚫 Оскорбления (5 часов)</button>
         <button class="rule-btn" onclick="sendRule('3')">🛑 Спам (2 часа)</button>
         <button class="rule-btn" onclick="sendRule('5')">ℹ️ Оффтоп (Варн)</button>
-        <button class="rule-btn" style="background:#e67e22" onclick="sendRule('custom')">⚡ Применить кастомное</button>
+        <button class="rule-btn btn-orange" onclick="sendRule('custom')">⚡ Применить кастомное</button>
         
-        <button class="logout-btn" onclick="logout()">Выйти из аккаунта</button>
+        <button class="logout-btn" onclick="logout()">Выйти из профиля</button>
     </div>
 
     <script>
@@ -130,12 +223,18 @@
             "kisyna123": "sorokmura"
         };
 
+        // Инициализация при загрузке
         window.onload = function() {
-            const savedUser = localStorage.getItem('myfine_auth');
+            const savedUser = localStorage.getItem('myfine_session');
             if (savedUser && users[savedUser]) {
-                renderAdminPanel(savedUser);
+                showPanel(savedUser);
             }
         };
+
+        function togglePassword() {
+            const p = document.getElementById('password');
+            p.type = p.type === 'password' ? 'text' : 'password';
+        }
 
         function checkLogin() {
             const user = document.getElementById('username').value.trim();
@@ -143,21 +242,25 @@
             const err = document.getElementById('login-error');
 
             if (users[user] && users[user] === pass) {
-                localStorage.setItem('myfine_auth', user);
-                renderAdminPanel(user);
+                if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+                localStorage.setItem('myfine_session', user);
+                showPanel(user);
             } else {
-                err.innerText = "Неверный логин или пароль!";
+                if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
+                err.style.display = 'block';
+                setTimeout(() => { err.style.display = 'none'; }, 3000);
             }
         }
 
-        function renderAdminPanel(username) {
+        function showPanel(name) {
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('admin-panel').classList.remove('hidden');
-            document.getElementById('welcome-text').innerText = "Привет, " + username + "!";
+            document.getElementById('welcome-text').innerText = "Привет, " + name + "!";
         }
 
         function logout() {
-            localStorage.removeItem('myfine_auth');
+            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+            localStorage.removeItem('myfine_session');
             location.reload();
         }
 
@@ -166,7 +269,8 @@
             const time = document.getElementById('custom_time').value.trim();
 
             if (!target) {
-                tg.showAlert("Укажите, кого наказываем!");
+                tg.showAlert("Укажите ID нарушителя!");
+                if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('warning');
                 return;
             }
 
@@ -177,6 +281,7 @@
                 custom_minutes: time
             };
 
+            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
             tg.sendData(JSON.stringify(data));
             tg.close();
         }
