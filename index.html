@@ -35,7 +35,6 @@
 
         h2 { text-align: center; color: var(--primary); margin-bottom: 20px; }
 
-        /* Поля ввода */
         .input-group { margin-bottom: 15px; }
         label { display: block; font-size: 11px; margin-bottom: 5px; font-weight: bold; opacity: 0.7; }
         input {
@@ -44,7 +43,6 @@
             color: var(--text); box-sizing: border-box; outline: none;
         }
 
-        /* Кнопки */
         .rule-btn {
             display: block; width: 100%; padding: 12px; margin: 8px 0;
             border: none; border-radius: 10px;
@@ -52,8 +50,18 @@
             color: #fff; font-weight: bold; cursor: pointer;
         }
         .rule-btn:active { opacity: 0.7; }
-        .hidden { display: none; }
         
+        .logout-btn {
+            background: transparent;
+            color: #e74c3c;
+            border: none;
+            width: 100%;
+            margin-top: 10px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .hidden { display: none; }
         .error { color: #e74c3c; font-size: 12px; text-align: center; margin-bottom: 10px; }
     </style>
 </head>
@@ -93,30 +101,51 @@
         <button class="rule-btn" onclick="sendRule('3')">🛑 Спам (2 часа)</button>
         <button class="rule-btn" onclick="sendRule('5')">ℹ️ Оффтоп (Варн)</button>
         <button class="rule-btn" style="background:#e67e22" onclick="sendRule('custom')">⚡ Применить кастомное</button>
+        
+        <button class="logout-btn" onclick="logout()">Выйти из аккаунта</button>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // "База данных" аккаунтов
         const users = {
             "nullkotek": "garte454",
             "kisyna123": "sorokmura"
         };
 
+        // 1. ПРОВЕРКА ПРИ ЗАГРУЗКЕ: если логин сохранен, заходим сразу
+        window.onload = function() {
+            const savedUser = localStorage.getItem('myfine_auth');
+            if (savedUser && users[savedUser]) {
+                renderAdminPanel(savedUser);
+            }
+        };
+
         function checkLogin() {
-            const user = document.getElementById('username').value;
-            const pass = document.getElementById('password').value;
+            const user = document.getElementById('username').value.trim();
+            const pass = document.getElementById('password').value.trim();
             const err = document.getElementById('login-error');
 
             if (users[user] && users[user] === pass) {
-                document.getElementById('login-screen').classList.add('hidden');
-                document.getElementById('admin-panel').classList.remove('hidden');
-                document.getElementById('welcome-text').innerText = "Привет, " + user + "!";
+                // 2. СОХРАНЕНИЕ: записываем логин в локальную память
+                localStorage.setItem('myfine_auth', user);
+                renderAdminPanel(user);
             } else {
                 err.innerText = "Неверный логин или пароль!";
             }
+        }
+
+        function renderAdminPanel(username) {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('admin-panel').classList.remove('hidden');
+            document.getElementById('welcome-text').innerText = "Привет, " + username + "!";
+        }
+
+        // 3. ФУНКЦИЯ ВЫХОДА: очистка памяти
+        function logout() {
+            localStorage.removeItem('myfine_auth');
+            location.reload(); // Перезагружаем страницу, чтобы вернуться на экран входа
         }
 
         function sendRule(ruleId) {
