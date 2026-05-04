@@ -3,49 +3,174 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Business Mini App</title>
+    <title>Business App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body {
-            font-family: sans-serif;
-            background-color: var(--tg-theme-bg-color); /* Используем цвета темы Telegram */
-            color: var(--tg-theme-text-color);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
+        :root {
+            --tg-bg: var(--tg-theme-bg-color, #ffffff);
+            --tg-text: var(--tg-theme-text-color, #000000);
+            --tg-button: var(--tg-theme-button-color, #248bed);
+            --tg-button-text: var(--tg-theme-button-text-color, #ffffff);
+            --tg-secondary: var(--tg-theme-secondary-bg-color, #f0f0f0);
         }
-        .card {
-            background: var(--tg-theme-secondary-bg-color);
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 10px;
-            width: 100%;
-            text-align: center;
-        }
-        button {
-            background: var(--tg-theme-button-color);
-            color: var(--tg-theme-button-text-color);
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-        }
+
+        body { font-family: sans-serif; background: var(--tg-bg); color: var(--tg-text); margin: 0; padding-bottom: 70px; }
+        .page { display: none; padding: 20px; }
+        .active { display: block; }
+
+        /* Иконки товаров */
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .item-card { background: var(--tg-secondary); padding: 15px; border-radius: 12px; text-align: center; }
+        .icon { font-size: 40px; margin-bottom: 10px; }
+
+        /* Навигация */
+        .nav { position: fixed; bottom: 0; width: 100%; background: var(--tg-secondary); display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #ccc; }
+        .nav-btn { background: none; border: none; color: var(--tg-text); cursor: pointer; font-size: 12px; }
+
+        /* Формы */
+        input { width: 100%; padding: 10px; margin: 10px 0; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; }
+        button.main-btn { width: 100%; background: var(--tg-button); color: var(--tg-button-text); border: none; padding: 12px; border-radius: 8px; font-weight: bold; }
+
+        /* Чат */
+        .chat-box { height: 200px; border: 1px solid #ccc; overflow-y: auto; margin-bottom: 10px; padding: 10px; border-radius: 8px; }
+        .ticket { background: var(--tg-secondary); padding: 10px; margin: 5px 0; border-radius: 5px; cursor: pointer; }
     </style>
 </head>
 <body>
-    <h1>Наш продукт</h1>
-    <div class="card">
-        <p>Лучшее предложение на рынке!</p>
-        <button onclick="showAlert()">Купить сейчас</button>
+
+    <div id="shop" class="page active">
+        <h2>Наши товары</h2>
+        <div class="grid">
+            <div class="item-card"><div class="icon">📦</div><p>Товар 1</p></div>
+            <div class="item-card"><div class="icon">🚀</div><p>Товар 2</p></div>
+            <div class="item-card"><div class="icon">💎</div><p>Товар 3</p></div>
+            <div class="item-card"><div class="icon">🔥</div><p>Товар 4</p></div>
+        </div>
     </div>
+
+    <div id="support" class="page">
+        <h2>Поддержка</h2>
+        <div id="user-view">
+            <p>Есть вопросы? Напишите нам:</p>
+            <div class="chat-box" id="user-chat"></div>
+            <input type="text" id="user-msg" placeholder="Ваш вопрос...">
+            <button class="main-btn" onclick="sendTicket()">Отправить</button>
+        </div>
+        
+        <div id="manager-view" style="display: none;">
+            <h3>Панель менеджера (nullkotek)</h3>
+            <div id="ticket-list"></div>
+            <hr>
+            <div id="active-chat" style="display:none;">
+                <p>Ответ пользователю:</p>
+                <input type="text" id="admin-reply" placeholder="Текст ответа...">
+                <button class="main-btn" onclick="replyToTicket()">Ответить</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="profile" class="page">
+        <div id="auth-form">
+            <h2>Вход / Регистрация</h2>
+            <input type="text" id="username" placeholder="Логин">
+            <input type="password" id="password" placeholder="Пароль">
+            <button class="main-btn" onclick="login()">Войти</button>
+            <p style="font-size: 12px; color: gray;">Для теста: nullkotek / kotek</p>
+        </div>
+        <div id="user-info" style="display: none;">
+            <h2 id="welcome-text"></h2>
+            <button class="main-btn" style="background: #ff4444;" onclick="logout()">Выйти</button>
+        </div>
+    </div>
+
+    <nav class="nav">
+        <button class="nav-btn" onclick="showPage('shop')">📦 Товары</button>
+        <button class="nav-btn" onclick="showPage('support')">🎧 Поддержка</button>
+        <button class="nav-btn" onclick="showPage('profile')">👤 Профиль</button>
+    </nav>
 
     <script>
         const tg = window.Telegram.WebApp;
-        tg.expand(); // Разворачивает окно на весь экран
+        tg.expand();
 
-        function showAlert() {
-            tg.showAlert("Спасибо за интерес! Менеджер свяжется с вами.");
+        let currentUser = null;
+        let tickets = []; // Имитация базы данных заявок
+        let currentTicketIndex = null;
+
+        function showPage(id) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        function login() {
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+
+            if (user === 'nullkotek' && pass === 'kotek') {
+                currentUser = { name: user, role: 'admin' };
+                document.getElementById('manager-view').style.display = 'block';
+                document.getElementById('user-view').style.display = 'none';
+            } else {
+                currentUser = { name: user, role: 'user' };
+                document.getElementById('manager-view').style.display = 'none';
+                document.getElementById('user-view').style.display = 'block';
+            }
+
+            document.getElementById('auth-form').style.display = 'none';
+            document.getElementById('user-info').style.display = 'block';
+            document.getElementById('welcome-text').innerText = "Привет, " + user;
+            renderTickets();
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('auth-form').style.display = 'block';
+            document.getElementById('user-info').style.display = 'none';
+            document.getElementById('manager-view').style.display = 'none';
+            document.getElementById('user-view').style.display = 'block';
+        }
+
+        // Логика поддержки
+        function sendTicket() {
+            const msg = document.getElementById('user-msg').value;
+            if (!msg) return;
+            tickets.push({ user: currentUser ? currentUser.name : "Аноним", text: msg, reply: null });
+            document.getElementById('user-msg').value = "";
+            renderTickets();
+            tg.showAlert("Вопрос отправлен менеджеру!");
+        }
+
+        function renderTickets() {
+            const list = document.getElementById('ticket-list');
+            const userChat = document.getElementById('user-chat');
+            list.innerHTML = "";
+            userChat.innerHTML = "";
+
+            tickets.forEach((t, i) => {
+                // Для менеджера
+                if (currentUser && currentUser.role === 'admin') {
+                    let item = document.createElement('div');
+                    item.className = 'ticket';
+                    item.innerHTML = `<b>${t.user}:</b> ${t.text} ${t.reply ? '✅' : '⏳'}`;
+                    item.onclick = () => { currentTicketIndex = i; document.getElementById('active-chat').style.display='block'; };
+                    list.appendChild(item);
+                }
+                // Для пользователя (видит свои)
+                if (!currentUser || t.user === currentUser.name) {
+                    userChat.innerHTML += `<p><b>Вы:</b> ${t.text}</p>`;
+                    if (t.reply) userChat.innerHTML += `<p style="color:blue"><b>Менеджер:</b> ${t.reply}</p>`;
+                }
+            });
+        }
+
+        function replyToTicket() {
+            const reply = document.getElementById('admin-reply').value;
+            if (currentTicketIndex !== null) {
+                tickets[currentTicketIndex].reply = reply;
+                document.getElementById('admin-reply').value = "";
+                document.getElementById('active-chat').style.display = 'none';
+                renderTickets();
+            }
         }
     </script>
 </body>
