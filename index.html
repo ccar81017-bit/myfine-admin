@@ -2,157 +2,50 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MyFine Premium</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Mini App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root {
-            --bg: #0b0e14;
-            --card: #171c26;
-            --accent: #3794ff;
-            --danger: #eb4d4b;
-            --warn: #f0932b;
-            --success: #6ab04c;
-            --text: #ffffff;
-        }
-
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            padding: 16px;
+            font-family: sans-serif;
+            background-color: var(--tg-theme-bg-color); /* Используем цвета темы Telegram */
+            color: var(--tg-theme-text-color);
             display: flex;
             flex-direction: column;
-            gap: 16px;
-        }
-
-        .section {
-            background: var(--card);
-            border-radius: 18px;
+            align-items: center;
             padding: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
-
-        h2 { font-size: 14px; color: #828a99; text-transform: uppercase; margin: 0 0 15px 0; letter-spacing: 0.5px; }
-
-        .input-group { margin-bottom: 12px; }
-        
-        input {
-            width: 100%;
-            padding: 14px;
-            background: #0d1117;
-            border: 1px solid #2d343e;
+        .card {
+            background: var(--tg-theme-secondary-bg-color);
+            padding: 15px;
             border-radius: 12px;
-            color: white;
-            font-size: 16px;
-            box-sizing: border-box;
-            outline: none;
-            transition: 0.2s;
-        }
-
-        input:focus { border-color: var(--accent); }
-
-        .btn {
+            margin-bottom: 10px;
             width: 100%;
-            padding: 14px;
+            text-align: center;
+        }
+        button {
+            background: var(--tg-theme-button-color);
+            color: var(--tg-theme-button-text-color);
             border: none;
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 8px;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: 0.2s;
-            margin-top: 8px;
         }
-
-        .btn:active { transform: scale(0.97); }
-
-        .btn-warn { background: var(--warn); color: white; }
-        .btn-mute { background: var(--accent); color: white; }
-        .btn-bc { background: var(--success); color: white; }
-
-        .admin-badge {
-            background: #232a35;
-            padding: 6px 12px;
-            border-radius: 50px;
-            font-size: 13px;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            margin: 4px;
-        }
-
-        .status-dot { width: 8px; height: 8px; border-radius: 50%; }
-        .online { background: var(--success); box-shadow: 0 0 8px var(--success); }
     </style>
 </head>
 <body>
-
-    <div class="section">
-        <h2>Администрация в сети</h2>
-        <div id="admin_list" style="display: flex; flex-wrap: wrap;"></div>
-    </div>
-
-    <div class="section">
-        <h2>Модерация игрока</h2>
-        <div class="input-group">
-            <input type="text" id="target" placeholder="Никнейм (без @) или ID">
-        </div>
-        <button class="btn btn-warn" onclick="send('warn')">
-            <i class="fas fa-exclamation-triangle"></i> Выдать Варн
-        </button>
-        <div style="margin-top: 15px;">
-            <input type="number" id="time" placeholder="Минуты мута">
-            <button class="btn btn-mute" onclick="send('mute')">
-                <i class="fas fa-comment-slash"></i> Отправить в мут
-            </button>
-        </div>
-    </div>
-
-    <div class="section">
-        <h2>Рассылка в группу</h2>
-        <input type="text" id="bc_msg" placeholder="Текст объявления...">
-        <button class="btn btn-bc" onclick="send('broadcast')">
-            <i class="fas fa-paper-plane"></i> Разослать
-        </button>
+    <h1>Наш продукт</h1>
+    <div class="card">
+        <p>Лучшее предложение на рынке!</p>
+        <button onclick="showAlert()">Купить сейчас</button>
     </div>
 
     <script>
-        let tg = window.Telegram.WebApp;
-        tg.ready();
-        tg.expand();
-        tg.enableClosingConfirmation();
+        const tg = window.Telegram.WebApp;
+        tg.expand(); // Разворачивает окно на весь экран
 
-        window.onload = function() {
-            const params = new URLSearchParams(window.location.search);
-            const data = params.get('admins');
-            if(data) {
-                const admins = JSON.parse(decodeURIComponent(data));
-                document.getElementById('admin_list').innerHTML = admins.map(a => `
-                    <div class="admin-badge">
-                        <div class="status-dot ${a.online?'online':''}"></div> ${a.login}
-                    </div>
-                `).join('');
-            }
-        };
-
-        function send(action) {
-            let res = { action: action };
-            if(action !== 'broadcast') {
-                res.user = document.getElementById('target').value.trim();
-                if(!res.user) return tg.showAlert("Укажите ник игрока!");
-            }
-            if(action === 'mute') res.time = document.getElementById('time').value || 10;
-            if(action === 'broadcast') res.text = document.getElementById('bc_msg').value;
-
-            tg.HapticFeedback.impactOccurred('medium');
-            tg.sendData(JSON.stringify(res));
-            tg.close();
+        function showAlert() {
+            tg.showAlert("Спасибо за интерес! Менеджер свяжется с вами.");
         }
     </script>
 </body>
